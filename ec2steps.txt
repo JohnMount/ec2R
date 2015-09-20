@@ -1,0 +1,22 @@
+
+# 8-8-2015
+# start a nice big CPU intance: Ubuntu 64 bit c3.8xlarge
+# are a free instance: Ubuntu 64 bit t2.micro
+
+# update and general tools
+# ssh -i KEY.PEM  ubuntu@IPADDRESS  # in my case *.pem.txt
+sudo apt-get -y update
+# if next step wants to change GRUB pick "keep current"
+sudo apt-get -y upgrade
+sudo apt-get -y install git
+# reboot
+sudo reboot
+
+
+
+# ssh back in to remote machine
+# ssh -i KEY.PEM  ubuntu@IPADDRESS  # in my case *.pem.txt
+git clone git@github.com:JohnMount/ec2R.git
+cd ec2R
+sudo bash ec2steps.bash
+
