@@ -1,14 +1,17 @@
 
 # 8-8-2015
-# start a nice big CPU intance: Ubuntu 64 bit c3.8xlarge
+# start a nice big CPU instance: Ubuntu 64 bit c3.8xlarge
 # are a free instance: Ubuntu 64 bit t2.micro
+# note down public IPs of any machines you start
+
+
 
 # update and general tools
 # ssh -i KEY.PEM  ubuntu@IPADDRESS  # in my case *.pem.txt
 sudo apt-get -y update
 # if next step wants to change GRUB pick "keep current"
-sudo apt-get -y upgrade
 sudo apt-get -y install git
+sudo apt-get -y upgrade
 # reboot
 sudo reboot
 
@@ -16,7 +19,38 @@ sudo reboot
 
 # ssh back in to remote machine
 # ssh -i KEY.PEM  ubuntu@IPADDRESS  # in my case *.pem.txt
-git clone git@github.com:JohnMount/ec2R.git
+git clone https://github.com/JohnMount/ec2R.git
 cd ec2R
 sudo bash ec2steps.bash
 
+
+# Use Amazon.com security group control to
+# alter security group to allow machine to machine communication
+# you need to open the security group to all incoming traffic from itself:
+# All traffic All All sg-10860e74 (launch-wizard-1)
+# see: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#security-group-rules
+# now give machines ssh keys to each other
+# on your local machine run:
+# ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f tmpKey
+# Copy key to each remote machine
+# scp tmpKey -i KEY.PEM tmpKey ubuntu@IPADDRES:.ssh/id_rsa
+# scp tmpKey -i KEY.PEM tmpKey.pub ubuntu@IPADDRES:.ssh/id_rsa.pub
+# on each remote machine:
+cat .ssh/id_rsa.pub >> .ssh/authorized_keys 
+
+# Pick one machine as "master" and ssh from it to each machine
+# and also ssh from each remote machine back to master so you can
+# say "yes" to "add to known question:
+# Get hostnames of all machines with "hostname"
+ssh ubuntu@HOSTNAME
+
+
+# now start R on the master and run your jobs in parallel on all machines
+# run step in exampleJob.R on master machine running R
+# replace hostnames in script with your hostnames
+R
+
+
+# Now be sure to TERMINATE all instances from ec2 web control (not just
+# shutdown or stop), and then delete all storage and other items (like
+# security groups) so you don't have ongoing charges!
